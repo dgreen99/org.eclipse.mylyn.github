@@ -17,6 +17,8 @@
 package org.eclipse.mylyn.github.internal;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -61,7 +63,8 @@ public class GitHubService {
 	private final static String LIST = "list/"; // Implemented
 	private final static String SEARCH = "search/"; // Implemented
 	// private final static String REOPEN = "reopen/";
-	// private final static String COMMENT = "comment/";
+	private final static String COMMENT = "comment/";
+	private final String COMMENTS = "comments/";
 	private final static String ADD_LABEL = "label/add/"; // Implemented
 	private final static String REMOVE_LABEL = "label/remove/"; // Implemented
 
@@ -458,7 +461,7 @@ public class GitHubService {
 		} catch (IOException e) {
 			throw new GitHubServiceException(e);
 		}
-		if (status != HttpStatus.SC_OK) {
+		if (status != HttpStatus.SC_OK && status != HttpStatus.SC_CREATED) {
 			switch (status) {
 			case HttpStatus.SC_UNAUTHORIZED:
 			case HttpStatus.SC_FORBIDDEN:
@@ -558,4 +561,53 @@ public class GitHubService {
 			}
 		}
 	}
+
+	public List<GitHubComment> getIssueComments(String user, String project, String taskId)
+			throws GitHubServiceException {
+		GetMethod method = null;
+		try {
+			method = new GetMethod(gitURLBase + gitIssueRoot + COMMENTS + user + "/" + project + "/" + taskId);
+			executeMethod(method);
+			GitHubComments ghComments = gson.fromJson(method.getResponseBodyAsString(), GitHubComments.class);
+
+			List<GitHubComment> comments = new ArrayList<GitHubComment>();
+			for (GitHubComment comment : ghComments.getComments()) {
+				comments.add(comment);
+			}
+
+			return comments;
+		} catch (RuntimeException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new GitHubServiceException(e);
+		} finally {
+			if (method != null) {
+				method.releaseConnection();
+			}
+		}
+	}
+
+	public void addComment(String user, String project, String taskId,
+			GitHubCredentials credentials, String commentText) throws GitHubServiceException {
+		PostMethod method = null;
+		try {
+			method = new  PostMethod(gitURLBase + gitIssueRoot + COMMENT + user + "/" + project + "/" + taskId);
+
+			final NameValuePair login = new NameValuePair("login", credentials.getUsername());
+			final NameValuePair token = new NameValuePair("token", credentials.getApiToken());
+			final NameValuePair comment = new NameValuePair("comment", commentText);
+
+			method.setRequestBody(new NameValuePair[] { login, token, comment });
+			executeMethod(method);
+		} catch (RuntimeException e){
+
+		} catch (Exception e) {
+			throw new GitHubServiceException(e);
+		} finally {
+			if (method != null) {
+				method.releaseConnection();
+			}
+		}
+	}
+
 }

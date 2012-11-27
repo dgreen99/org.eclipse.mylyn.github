@@ -16,6 +16,7 @@
  */
 package org.eclipse.mylyn.github.internal;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -135,8 +136,9 @@ public class GitHubRepositoryConnector extends AbstractRepositoryConnector {
 	
 				// collect task data
 				for (GitHubIssue issue : issues.getIssues()) {
+					List<GitHubComment> comments = service.getIssueComments(user, project, issue.getNumber());
 					TaskData taskData = taskDataHandler.createPartialTaskData(
-							repository, monitor,user, project, issue);
+							repository, monitor,user, project, issue, comments);
 					collector.accept(taskData);
 				}
 				monitor.worked(1);
@@ -161,7 +163,8 @@ public class GitHubRepositoryConnector extends AbstractRepositoryConnector {
 		
 		try {
 			GitHubIssue issue = service.showIssue(user, project, taskId);
-			TaskData taskData = taskDataHandler.createTaskData(repository, monitor, user, project, issue);
+			List<GitHubComment> comments = service.getIssueComments(user, project, issue.getNumber());
+			TaskData taskData = taskDataHandler.createTaskData(repository, monitor, user, project, issue, comments);
 			
 			return taskData;
 		} catch (GitHubServiceException e) {
