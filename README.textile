@@ -1,10 +1,16 @@
+h1. Status
+
+*This project is no longer maintained!  There is an official "GitHub Mylyn Connector":https://marketplace.eclipse.org/content/github-mylyn-connector which should be used instead.*
+
 h2. Fork Specifics
 
 This is a fork of the "original connector":http://smilebase.github.com/org.eclipse.mylyn.github by smilebase.  "Configuration/installation specifics for this fork can be found in the project wiki":http://wiki.github.com/dgreen99/org.eclipse.mylyn.github/
 
 h2. Installation update site
 
-h3. http://dgreen99.github.com/org.eclipse.mylyn.github/site
+This connector is no longer maintained.  Use the official "GitHub Mylyn Connector":https://marketplace.eclipse.org/content/github-mylyn-connector instead.
+
+-http://dgreen99.github.com/org.eclipse.mylyn.github/site- 
 
 *WARNING:* This connector has ALPHA status. 
 
